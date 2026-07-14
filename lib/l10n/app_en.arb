@@ -1,0 +1,555 @@
+{
+  "@@locale": "en",
+  "appTitle": "Password Manager",
+  "@appTitle": {
+    "description": "The application's title, shown in the OS task switcher and as a fallback window title."
+  },
+  "homeWelcomeMessage": "Welcome to your vault",
+  "@homeWelcomeMessage": {
+    "description": "Placeholder welcome message shown on the home screen scaffold."
+  },
+  "homeSignOutButton": "Sign out",
+  "@homeSignOutButton": {
+    "description": "Button that signs the user out entirely."
+  },
+  "homeLockButton": "Lock now",
+  "@homeLockButton": {
+    "description": "Button that immediately locks the session without signing out."
+  },
+  "authEmailLabel": "Email",
+  "@authEmailLabel": {
+    "description": "Label for the email text field on auth screens."
+  },
+  "authMasterSecretLabel": "Master secret",
+  "@authMasterSecretLabel": {
+    "description": "Label for the master secret (password) text field on auth screens."
+  },
+  "authGenericError": "Something went wrong. Please try again.",
+  "@authGenericError": {
+    "description": "Fallback error message shown when an auth operation fails."
+  },
+  "signUpTitle": "Create account",
+  "@signUpTitle": {
+    "description": "Title of the sign-up screen."
+  },
+  "signUpContinueButton": "Continue",
+  "@signUpContinueButton": {
+    "description": "Button that moves from credential entry to the recovery-mode choice."
+  },
+  "signUpHaveAccountLink": "Already have an account? Sign in",
+  "@signUpHaveAccountLink": {
+    "description": "Link that navigates from sign-up to sign-in."
+  },
+  "signInTitle": "Sign in",
+  "@signInTitle": {
+    "description": "Title of the sign-in screen."
+  },
+  "signInSubmitButton": "Sign in",
+  "@signInSubmitButton": {
+    "description": "Button that submits the sign-in form."
+  },
+  "signInNoAccountLink": "Need an account? Create one",
+  "@signInNoAccountLink": {
+    "description": "Link that navigates from sign-in to sign-up."
+  },
+  "recoveryModeTitle": "Choose your recovery mode",
+  "@recoveryModeTitle": {
+    "description": "Title of the recovery-mode choice screen shown before account creation."
+  },
+  "recoveryModeIntro": "This choice affects what happens if you lose this device or forget your master secret. Read both options before continuing — you are making an informed, permanent choice.",
+  "@recoveryModeIntro": {
+    "description": "Intro copy on the recovery-mode choice screen."
+  },
+  "recoveryModeLocalTitle": "Local-only",
+  "@recoveryModeLocalTitle": {
+    "description": "Title of the local-only recovery mode option."
+  },
+  "recoveryModeLocalDescription": "Your master secret and vault key exist only on this device. No recovery is possible: losing this device or forgetting your master secret means permanent, total data loss. Your vault cannot sync to another device, and it is lost if you uninstall the app or wipe the device.",
+  "@recoveryModeLocalDescription": {
+    "description": "Consequence statement for the local-only recovery mode, per GOALS_v2 1.3 item 1."
+  },
+  "recoveryModeChooseLocalButton": "Choose local-only",
+  "@recoveryModeChooseLocalButton": {
+    "description": "Button that selects local-only recovery mode."
+  },
+  "recoveryModeRemoteTitle": "Remote backup",
+  "@recoveryModeRemoteTitle": {
+    "description": "Title of the remote-backup recovery mode option."
+  },
+  "recoveryModeRemoteDescription": "An encrypted copy of your vault is stored on our servers, still zero-knowledge — the server holds ciphertext only. This protects against device loss only if you remember your master secret: the server holds no plaintext and cannot recover a forgotten master secret either. A copy of your vault does leave this device, as ciphertext.",
+  "@recoveryModeRemoteDescription": {
+    "description": "Consequence statement for the remote-backup recovery mode, per GOALS_v2 1.3 item 2."
+  },
+  "recoveryModeChooseRemoteButton": "Choose remote backup",
+  "@recoveryModeChooseRemoteButton": {
+    "description": "Button that selects remote-backup recovery mode."
+  },
+  "confirmEmailTitle": "Confirm your email",
+  "@confirmEmailTitle": {
+    "description": "Title of the email confirmation screen."
+  },
+  "confirmEmailInstructions": "We sent a confirmation code to {email}. Enter it below to activate your account.",
+  "@confirmEmailInstructions": {
+    "description": "Instructions shown on the confirm-email screen, naming the address the code was sent to.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmEmailCodeLabel": "Confirmation code",
+  "@confirmEmailCodeLabel": {
+    "description": "Label for the confirmation code text field."
+  },
+  "confirmEmailSubmitButton": "Confirm",
+  "@confirmEmailSubmitButton": {
+    "description": "Button that submits the confirmation code."
+  },
+  "lockTitle": "Vault locked",
+  "@lockTitle": {
+    "description": "Title of the lock screen shown when a session is locked."
+  },
+  "lockInstructions": "Re-enter your master secret to unlock your vault.",
+  "@lockInstructions": {
+    "description": "Instructions shown on the lock screen."
+  },
+  "lockUnlockButton": "Unlock",
+  "@lockUnlockButton": {
+    "description": "Button that submits the master secret to unlock the vault."
+  },
+  "lockBiometricButton": "Unlock with biometrics",
+  "@lockBiometricButton": {
+    "description": "Button that attempts biometric unlock."
+  },
+  "lockSignOutButton": "Sign out instead",
+  "@lockSignOutButton": {
+    "description": "Button on the lock screen that signs out entirely instead of unlocking."
+  },
+  "biometricEnableButton": "Enable biometric unlock",
+  "@biometricEnableButton": {
+    "description": "Button offered after unlocking to enable biometric unlock going forward."
+  },
+  "biometricUnlockFailedError": "Biometric unlock failed.",
+  "@biometricUnlockFailedError": {
+    "description": "Shown on the lock screen when a biometric unlock attempt fails."
+  },
+  "biometricUnlockReason": "Unlock your vault",
+  "@biometricUnlockReason": {
+    "description": "Reason string passed to the OS biometric prompt explaining why authentication is being requested."
+  },
+  "incorrectMasterSecretError": "Incorrect master secret.",
+  "@incorrectMasterSecretError": {
+    "description": "Shown when a re-entered master secret fails verification against the stored vault-key verifier (e.g. on the lock screen)."
+  },
+  "sessionInvalidError": "Your session is no longer valid on this device. Please sign in again.",
+  "@sessionInvalidError": {
+    "description": "Shown after a forced sign-out because the stored session/tokens are no longer valid."
+  },
+  "vaultEmptyState": "No items yet. Tap + to add your first password.",
+  "@vaultEmptyState": {
+    "description": "Shown on the vault home screen when the account has no active items."
+  },
+  "vaultAddItemButton": "Add item",
+  "@vaultAddItemButton": {
+    "description": "Tooltip/label for the floating action button that creates a new vault item."
+  },
+  "vaultTrashButton": "Trash",
+  "@vaultTrashButton": {
+    "description": "Tooltip/label for the app bar action that opens the trash screen."
+  },
+  "vaultItemDeleteButton": "Delete",
+  "@vaultItemDeleteButton": {
+    "description": "Button that soft-deletes a vault item."
+  },
+  "vaultItemEditButton": "Edit",
+  "@vaultItemEditButton": {
+    "description": "Button that opens the edit form for a vault item."
+  },
+  "vaultItemSaveButton": "Save",
+  "@vaultItemSaveButton": {
+    "description": "Button that submits the create/edit vault item form."
+  },
+  "vaultItemCreateTitle": "New item",
+  "@vaultItemCreateTitle": {
+    "description": "Title of the create-item form screen."
+  },
+  "vaultItemEditTitle": "Edit item",
+  "@vaultItemEditTitle": {
+    "description": "Title of the edit-item form screen."
+  },
+  "vaultFieldIdentifier": "Username / email",
+  "@vaultFieldIdentifier": {
+    "description": "Label for the identifier (username/email) field on the item form."
+  },
+  "vaultFieldSecret": "Password",
+  "@vaultFieldSecret": {
+    "description": "Label for the secret (password) field on the item form."
+  },
+  "vaultFieldSiteName": "Site / app name",
+  "@vaultFieldSiteName": {
+    "description": "Label for the site/app name field on the item form."
+  },
+  "vaultFieldUrl": "URL",
+  "@vaultFieldUrl": {
+    "description": "Label for the URL field on the item form."
+  },
+  "vaultFieldNotes": "Notes",
+  "@vaultFieldNotes": {
+    "description": "Label for the notes field on the item form."
+  },
+  "vaultFieldTags": "Tags (comma separated)",
+  "@vaultFieldTags": {
+    "description": "Label for the tags/folder field on the item form."
+  },
+  "vaultFieldRequiredError": "This field is required",
+  "@vaultFieldRequiredError": {
+    "description": "Validation error shown for a required, empty field."
+  },
+  "vaultRevealSecretTooltip": "Show password",
+  "@vaultRevealSecretTooltip": {
+    "description": "Tooltip for the button that reveals a masked secret."
+  },
+  "vaultHideSecretTooltip": "Hide password",
+  "@vaultHideSecretTooltip": {
+    "description": "Tooltip for the button that re-masks a revealed secret."
+  },
+  "vaultCopySecretTooltip": "Copy password",
+  "@vaultCopySecretTooltip": {
+    "description": "Tooltip for the button that copies the secret to the clipboard."
+  },
+  "vaultSecretCopiedMessage": "Password copied. It will be cleared from the clipboard automatically.",
+  "@vaultSecretCopiedMessage": {
+    "description": "Snackbar shown after copying a secret to the clipboard, warning it will auto-clear."
+  },
+  "vaultRevisionHistoryTitle": "Revision history",
+  "@vaultRevisionHistoryTitle": {
+    "description": "Section heading for the revision history list on the item detail screen."
+  },
+  "vaultRevisionEmptyState": "No previous versions yet.",
+  "@vaultRevisionEmptyState": {
+    "description": "Shown when an item has no revision history."
+  },
+  "vaultRevisionRestoreButton": "Restore this version",
+  "@vaultRevisionRestoreButton": {
+    "description": "Button that restores a specific prior revision as the current version."
+  },
+  "vaultRevisionSavedAt": "Saved {date}",
+  "@vaultRevisionSavedAt": {
+    "description": "Label showing when a revision was saved.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "vaultTrashTitle": "Trash",
+  "@vaultTrashTitle": {
+    "description": "Title of the trash screen."
+  },
+  "vaultTrashEmptyState": "Trash is empty.",
+  "@vaultTrashEmptyState": {
+    "description": "Shown when there are no items in trash."
+  },
+  "vaultTrashRestoreButton": "Restore",
+  "@vaultTrashRestoreButton": {
+    "description": "Button that restores a trashed item."
+  },
+  "vaultTrashDeletedOn": "Deleted {date}",
+  "@vaultTrashDeletedOn": {
+    "description": "Label showing when a trashed item was deleted.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "vaultDeleteConfirmTitle": "Delete this item?",
+  "@vaultDeleteConfirmTitle": {
+    "description": "Title of the confirmation dialog shown before soft-deleting an item."
+  },
+  "vaultDeleteConfirmMessage": "It will move to Trash and can be restored within 30 days.",
+  "@vaultDeleteConfirmMessage": {
+    "description": "Body text of the delete confirmation dialog."
+  },
+  "vaultCancelButton": "Cancel",
+  "@vaultCancelButton": {
+    "description": "Generic cancel button used in dialogs."
+  },
+  "vaultGenerateSecretButton": "Generate",
+  "@vaultGenerateSecretButton": {
+    "description": "Button on the item form that opens the password generator to fill the secret field."
+  },
+  "generatorTitle": "Password generator",
+  "@generatorTitle": {
+    "description": "Title of the generator screen."
+  },
+  "generatorModeCharacters": "Random characters",
+  "@generatorModeCharacters": {
+    "description": "Label for character-based generation mode."
+  },
+  "generatorModePassphrase": "Passphrase",
+  "@generatorModePassphrase": {
+    "description": "Label for Diceware-style passphrase generation mode."
+  },
+  "generatorLengthLabel": "Length: {length}",
+  "@generatorLengthLabel": {
+    "description": "Label showing the current character-password length.",
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "generatorUppercaseLabel": "Uppercase (A-Z)",
+  "@generatorUppercaseLabel": {
+    "description": "Toggle label for including uppercase letters."
+  },
+  "generatorLowercaseLabel": "Lowercase (a-z)",
+  "@generatorLowercaseLabel": {
+    "description": "Toggle label for including lowercase letters."
+  },
+  "generatorDigitsLabel": "Digits (0-9)",
+  "@generatorDigitsLabel": {
+    "description": "Toggle label for including digits."
+  },
+  "generatorSymbolsLabel": "Symbols (!@#...)",
+  "@generatorSymbolsLabel": {
+    "description": "Toggle label for including symbols."
+  },
+  "generatorExcludeAmbiguousLabel": "Exclude ambiguous characters (0/O, 1/l/I)",
+  "@generatorExcludeAmbiguousLabel": {
+    "description": "Toggle label for excluding visually ambiguous characters."
+  },
+  "generatorWordCountLabel": "Words: {count}",
+  "@generatorWordCountLabel": {
+    "description": "Label showing the current passphrase word count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "generatorSeparatorLabel": "Word separator",
+  "@generatorSeparatorLabel": {
+    "description": "Label for the passphrase word-separator text field."
+  },
+  "generatorCapitalizeLabel": "Capitalize each word",
+  "@generatorCapitalizeLabel": {
+    "description": "Toggle label for capitalizing each passphrase word."
+  },
+  "generatorAppendNumberLabel": "Append a random number",
+  "@generatorAppendNumberLabel": {
+    "description": "Toggle label for appending a random digit to the passphrase."
+  },
+  "generatorRegenerateButton": "Regenerate",
+  "@generatorRegenerateButton": {
+    "description": "Button that generates a new value with the current options."
+  },
+  "generatorCopyButton": "Copy",
+  "@generatorCopyButton": {
+    "description": "Button that copies the generated value to the clipboard."
+  },
+  "generatorValueCopiedMessage": "Copied. It will be cleared from the clipboard automatically.",
+  "@generatorValueCopiedMessage": {
+    "description": "Snackbar shown after copying the generated value to the clipboard, warning it will auto-clear."
+  },
+  "generatorUseThisPasswordButton": "Use this password",
+  "@generatorUseThisPasswordButton": {
+    "description": "Button that returns the generated value to the caller (e.g. the item form)."
+  },
+  "generatorErrorNoCharacterSet": "Choose at least one character set.",
+  "@generatorErrorNoCharacterSet": {
+    "description": "Error shown when every character-set toggle is off."
+  },
+  "generatorStrengthLabel": "Strength: {label}",
+  "@generatorStrengthLabel": {
+    "description": "Label showing the estimated strength of the current password.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "generatorStrengthVeryWeak": "Very weak",
+  "@generatorStrengthVeryWeak": {
+    "description": "Strength meter label."
+  },
+  "generatorStrengthWeak": "Weak",
+  "@generatorStrengthWeak": {
+    "description": "Strength meter label."
+  },
+  "generatorStrengthFair": "Fair",
+  "@generatorStrengthFair": {
+    "description": "Strength meter label."
+  },
+  "generatorStrengthStrong": "Strong",
+  "@generatorStrengthStrong": {
+    "description": "Strength meter label."
+  },
+  "generatorStrengthVeryStrong": "Very strong",
+  "@generatorStrengthVeryStrong": {
+    "description": "Strength meter label."
+  },
+  "generatorStrengthEstimateNote": "Estimate only — a heuristic, not a full cracking-time analysis.",
+  "@generatorStrengthEstimateNote": {
+    "description": "Disclaimer shown near the strength meter clarifying it is not a zxcvbn-parity analysis."
+  },
+  "generatorStrengthCommonPasswordWarning": "This is one of the most commonly used passwords — avoid it.",
+  "@generatorStrengthCommonPasswordWarning": {
+    "description": "Warning shown when the entered/generated password matches a known common password."
+  },
+  "deviceManagementButton": "Devices",
+  "@deviceManagementButton": {
+    "description": "Tooltip/label for the app bar action that opens the device management screen."
+  },
+  "deviceManagementTitle": "Registered devices",
+  "@deviceManagementTitle": {
+    "description": "Title of the device management screen."
+  },
+  "deviceManagementEmptyState": "No devices registered yet.",
+  "@deviceManagementEmptyState": {
+    "description": "Shown on the device management screen when no devices are registered."
+  },
+  "deviceStatusActive": "Trusted",
+  "@deviceStatusActive": {
+    "description": "Status label for an active/trusted device."
+  },
+  "deviceStatusPending": "Pending approval",
+  "@deviceStatusPending": {
+    "description": "Status label for a device awaiting approval from an already-trusted device."
+  },
+  "deviceStatusRevoked": "Revoked",
+  "@deviceStatusRevoked": {
+    "description": "Status label for a revoked device."
+  },
+  "deviceApproveButton": "Approve",
+  "@deviceApproveButton": {
+    "description": "Button that approves a pending device."
+  },
+  "deviceRevokeButton": "Revoke",
+  "@deviceRevokeButton": {
+    "description": "Button that revokes a device's access."
+  },
+  "deviceRegisteredOn": "Registered {date}",
+  "@deviceRegisteredOn": {
+    "description": "Label showing when a device was first registered.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deviceSimulateNewDeviceButton": "Simulate new device",
+  "@deviceSimulateNewDeviceButton": {
+    "description": "Button that registers a throwaway second device identity as pending, to demonstrate the approval flow without a real second physical device."
+  },
+  "deviceSimulateNewDeviceNote": "Testing on a single device: this button stands in for a second physical device registering itself, so you can try approving/revoking a pending device.",
+  "@deviceSimulateNewDeviceNote": {
+    "description": "Explanatory note on the device management screen about the single-device testing limitation."
+  },
+  "deviceSimulatedDeviceName": "Simulated new device",
+  "@deviceSimulatedDeviceName": {
+    "description": "Display name given to the throwaway device identity registered by the 'simulate new device' testing affordance."
+  },
+  "securityBlockedTitle": "This device can't run this app",
+  "@securityBlockedTitle": {
+    "description": "Title shown on the blocking screen when a release build detects a rooted/jailbroken device."
+  },
+  "securityBlockedMessage": "This app stores sensitive credentials and cannot run on a rooted or jailbroken device, where the operating system's normal security guarantees no longer hold. Please use this app on an unmodified device.",
+  "@securityBlockedMessage": {
+    "description": "Explanatory body text on the root/jailbreak blocking screen. There is deliberately no way to dismiss or bypass this screen."
+  },
+  "accountButton": "Account",
+  "@accountButton": {
+    "description": "Button/tooltip that navigates to the account screen from the home screen."
+  },
+  "accountScreenTitle": "Account",
+  "@accountScreenTitle": {
+    "description": "Title of the account screen."
+  },
+  "accountExportCsvButton": "Export vault to CSV",
+  "@accountExportCsvButton": {
+    "description": "Entry point on the account screen that navigates to the CSV export flow."
+  },
+  "accountDeleteAccountButton": "Delete account",
+  "@accountDeleteAccountButton": {
+    "description": "Entry point on the account screen that navigates to the account deletion flow."
+  },
+  "deleteAccountTitle": "Delete account",
+  "@deleteAccountTitle": {
+    "description": "Title of the account-deletion screen."
+  },
+  "deleteAccountWarning": "Deleting your account is permanent and cannot be undone. This will immediately and unconditionally erase your account, all vault items, and all backups from every device where you're signed in — there is no recovery, no grace period, and no way to retrieve this data afterward.",
+  "@deleteAccountWarning": {
+    "description": "Clear upfront communication of what account deletion means, shown before the user can proceed, per GOALS_v2 1.7."
+  },
+  "deleteAccountAcknowledgeCheckbox": "I understand this action is permanent and cannot be undone.",
+  "@deleteAccountAcknowledgeCheckbox": {
+    "description": "Checkbox the user must explicitly check before account deletion can proceed."
+  },
+  "deleteAccountReauthInstructions": "Re-enter your master secret to confirm it's you.",
+  "@deleteAccountReauthInstructions": {
+    "description": "Instructions for the re-authentication step of the account-deletion flow."
+  },
+  "deleteAccountConfirmTextLabel": "Type DELETE to confirm",
+  "@deleteAccountConfirmTextLabel": {
+    "description": "Label for the type-to-confirm text field on the account-deletion screen."
+  },
+  "deleteAccountConfirmTextMismatch": "Type DELETE exactly to confirm.",
+  "@deleteAccountConfirmTextMismatch": {
+    "description": "Validation message shown when the type-to-confirm text doesn't match the required literal."
+  },
+  "deleteAccountSubmitButton": "Permanently delete my account",
+  "@deleteAccountSubmitButton": {
+    "description": "Final submit button for account deletion. Only enabled once every safeguard (acknowledgement, re-auth, type-to-confirm) is satisfied."
+  },
+  "deleteAccountReauthError": "Incorrect master secret. Please try again.",
+  "@deleteAccountReauthError": {
+    "description": "Error shown when re-authentication fails during account deletion."
+  },
+  "exportCsvTitle": "Export vault to CSV",
+  "@exportCsvTitle": {
+    "description": "Title of the CSV export screen."
+  },
+  "exportCsvWarning": "The exported file will contain every saved password in plain, unencrypted text. Anyone with access to this file can read your passwords. Store it somewhere safe and delete it as soon as you're done with it.",
+  "@exportCsvWarning": {
+    "description": "Explicit warning about handling the exported plaintext CSV file, shown before export, per GOALS_v2 3.3."
+  },
+  "exportCsvReauthInstructions": "Re-enter your master secret to confirm it's you.",
+  "@exportCsvReauthInstructions": {
+    "description": "Instructions for the re-authentication step of the CSV export flow."
+  },
+  "exportCsvSubmitButton": "Export now",
+  "@exportCsvSubmitButton": {
+    "description": "Button that performs the CSV export after re-authentication."
+  },
+  "exportCsvReauthError": "Incorrect master secret. Please try again.",
+  "@exportCsvReauthError": {
+    "description": "Error shown when re-authentication fails during CSV export."
+  },
+  "exportCsvSuccessMessage": "Export complete. Delete this file once you no longer need it:\n{path}",
+  "@exportCsvSuccessMessage": {
+    "description": "Success message shown after CSV export, restating the delete-when-done warning and showing the file path.",
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "noPendingAccountError": "No pending account to confirm.",
+  "@noPendingAccountError": {
+    "description": "Defensive-guard error surfaced if the email confirmation screen is somehow reached with no pending sign-up in progress."
+  },
+  "noActiveSessionError": "No active session to delete.",
+  "@noActiveSessionError": {
+    "description": "Defensive-guard error surfaced if account deletion is somehow attempted with no active session."
+  },
+  "noUnlockedVaultError": "No unlocked vault to export.",
+  "@noUnlockedVaultError": {
+    "description": "Defensive-guard error surfaced if CSV export is somehow attempted with no unlocked vault available."
+  },
+  "genericErrorLabel": "Something went wrong. Please try again.",
+  "@genericErrorLabel": {
+    "description": "Fallback message shown around an async-loading error (e.g. AsyncValue.error) on list-style screens. Deliberately does not interpolate the underlying exception's message/toString() into the UI — raw exception text (stack details, internal type names, etc.) must never be shown to the user, matching the authGenericError precedent."
+  }
+}

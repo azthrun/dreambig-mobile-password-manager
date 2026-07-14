@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Native-side (Kotlin) user-facing strings for the Android Autofill
+      Framework integration (GOALS_v2 §1.8). Flutter's l10n mechanism
+      (lib/l10n/app_en.arb) only covers Dart code — it doesn't reach native
+      Kotlin, which is why these live here instead. This is the idiomatic
+      Android equivalent: strings are externalized into a resource file
+      (not hardcoded string literals in .kt files) so they *can* be
+      localized later by adding values-<locale>/strings.xml overrides, even
+      though only English is required for Phase 1 (GOALS_v2 §3.4 — target
+      locale(s) still to be confirmed, English-only is sufficient for now).
+    -->
+    <string name="autofill_unlock_prompt">Unlock to autofill</string>
+</resources>

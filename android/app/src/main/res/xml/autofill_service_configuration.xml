@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Referenced from AndroidManifest.xml's PasswordManagerAutofillService
+     <meta-data android:name="android.autofill">. `settingsActivity` is
+     what Android's "Settings > Autofill service" screen links to for this
+     app's own autofill-related settings (GOALS_v2 §1.8); pointed at
+     MainActivity since there's no dedicated autofill-settings screen in
+     Phase 1. -->
+<autofill-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.dreambig.password_manager.MainActivity" />
