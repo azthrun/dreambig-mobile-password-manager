@@ -23,6 +23,10 @@ Future<void> _signUpAndReachHome(WidgetTester tester) async {
   await tester.pumpAndSettle();
   await tester.enterText(find.byKey(const Key('signUpEmailField')), _kEmail);
   await tester.enterText(
+    find.byKey(const Key('signUpAccountPasswordField')),
+    'test account password',
+  );
+  await tester.enterText(
     find.byKey(const Key('signUpMasterSecretField')),
     _kMasterSecret,
   );

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Adaptive-icon background layer: matches the indigo of the legacy
+         full-bleed icon raster. -->
+    <color name="ic_launcher_background">#4A46B8</color>
+</resources>

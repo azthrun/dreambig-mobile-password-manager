@@ -3,12 +3,14 @@ import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
 
-/// Result of deriving the two independent keys from a user's master secret
-/// (GOALS_v2 §1.3).
+/// Result of deriving the two independent keys from the user's two
+/// independent secrets (GOALS_v2 §1.3): [authKey] from the account
+/// password, [vaultKey] from the master secret.
 ///
-/// [authKey] and [vaultKey] are derived so that neither is computable from
-/// the other. [vaultKey] must never be transmitted or leave the device;
-/// only [authKey] (already stretched/hashed) is ever sent to `ApiClient`.
+/// [authKey] and [vaultKey] are derived from *different* user-supplied
+/// secrets, so neither is computable from the other even in principle.
+/// [vaultKey] must never be transmitted or leave the device; only
+/// [authKey] (already stretched/hashed) is ever sent to `ApiClient`.
 class DerivedKeyMaterial {
   const DerivedKeyMaterial({required this.authKey, required this.vaultKey});
 
@@ -38,22 +40,21 @@ class DerivedKeyMaterial {
   String toString() => 'DerivedKeyMaterial(authKey: <redacted>, vaultKey: <redacted>)';
 }
 
-/// Derives the two domain-separated keys described in GOALS_v2 §1.3 from a
-/// user's master secret.
+/// Derives the two domain-separated keys described in GOALS_v2 §1.3 from
+/// the user's **two distinct secrets**: the account password (which
+/// authenticates to the backend) and the master secret (which protects the
+/// vault). Keeping the inputs separate means the backend-facing credential
+/// chain never even touches the secret that encrypts vault data.
 ///
-/// Derivation pipeline:
-///  1. **Slow stretch** — `Argon2id(masterSecret, salt)` produces
-///     intermediate key material (IKM). This is the only step exposed to
-///     the master secret's comparatively low entropy; Argon2id's
-///     memory-hardness makes offline brute force expensive.
-///  2. **Domain-separated expansion** — HKDF (RFC 5869) is run twice against
-///     the *same* IKM but with two different `info` labels, producing the
-///     authentication key and the vault encryption key. HKDF's PRF security
-///     means recovering the IKM (or the sibling output) from one HKDF
-///     output is computationally infeasible. This is exactly the
-///     "independent KDF derivations ... e.g. HKDF with different info
-///     labels" construction GOALS_v2 §1.3 names as satisfying the two-key
-///     split, without paying Argon2id's cost twice per authentication.
+/// Derivation pipeline (run independently per secret):
+///  1. **Slow stretch** — `Argon2id(secret, salt)` produces intermediate
+///     key material (IKM). This is the only step exposed to the secret's
+///     comparatively low entropy; Argon2id's memory-hardness makes offline
+///     brute force expensive.
+///  2. **Domain-separated expansion** — HKDF (RFC 5869) with a
+///     purpose-specific `info` label (`auth-key` for the account password,
+///     `vault-key` for the master secret), so even identical inputs could
+///     never yield colliding outputs across the two domains.
 ///
 /// The Argon2id salt is derived deterministically from the account email so
 /// sign-in can reproduce the same keys without a backend ever storing or
@@ -98,39 +99,58 @@ class MasterKeyDeriver {
     return digest.bytes;
   }
 
-  /// Derives [DerivedKeyMaterial] for the given [email] + [masterSecret].
-  ///
-  /// Deterministic: the same inputs always produce the same outputs, which
-  /// is required so sign-in can re-derive the same vault key the device
-  /// used at sign-up time.
-  Future<DerivedKeyMaterial> deriveKeys({
+  Future<Uint8List> _derive({
     required String email,
-    required String masterSecret,
+    required String secret,
+    required List<int> info,
   }) async {
     final normalizedEmail = email.trim().toLowerCase();
     final salt = await _saltForEmail(normalizedEmail);
 
     final stretched = await _argon2id.deriveKey(
-      secretKey: SecretKey(utf8.encode(masterSecret)),
+      secretKey: SecretKey(utf8.encode(secret)),
       nonce: salt,
     );
 
     final hkdf = Hkdf(hmac: Hmac.sha256(), outputLength: derivedKeyLength);
-
-    final authKeySecret = await hkdf.deriveKey(
+    final derived = await hkdf.deriveKey(
       secretKey: stretched,
       nonce: salt,
-      info: authKeyInfo,
+      info: info,
     );
-    final vaultKeySecret = await hkdf.deriveKey(
-      secretKey: stretched,
-      nonce: salt,
-      info: vaultKeyInfo,
-    );
+    return Uint8List.fromList(await derived.extractBytes());
+  }
 
+  /// Derives the backend authentication key from the [email] +
+  /// [accountPassword]. Deterministic, so sign-in reproduces the exact
+  /// credential the backend stored at sign-up.
+  ///
+  /// Never derived from the master secret: the account password is the
+  /// only secret whose (stretched) derivative ever leaves the device.
+  Future<Uint8List> deriveAuthKey({
+    required String email,
+    required String accountPassword,
+  }) => _derive(email: email, secret: accountPassword, info: authKeyInfo);
+
+  /// Derives the vault encryption key from the [email] + [masterSecret].
+  /// Deterministic, so sign-in/unlock re-derives the same vault key the
+  /// device used at sign-up time. Never transmitted.
+  Future<Uint8List> deriveVaultKey({
+    required String email,
+    required String masterSecret,
+  }) => _derive(email: email, secret: masterSecret, info: vaultKeyInfo);
+
+  /// Derives both keys from their respective secrets — see [deriveAuthKey]
+  /// and [deriveVaultKey]. [accountPassword] and [masterSecret] are
+  /// deliberately two different user-supplied values (enforced at sign-up).
+  Future<DerivedKeyMaterial> deriveKeys({
+    required String email,
+    required String accountPassword,
+    required String masterSecret,
+  }) async {
     return DerivedKeyMaterial(
-      authKey: Uint8List.fromList(await authKeySecret.extractBytes()),
-      vaultKey: Uint8List.fromList(await vaultKeySecret.extractBytes()),
+      authKey: await deriveAuthKey(email: email, accountPassword: accountPassword),
+      vaultKey: await deriveVaultKey(email: email, masterSecret: masterSecret),
     );
   }
 

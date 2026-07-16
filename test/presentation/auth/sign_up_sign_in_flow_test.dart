@@ -32,6 +32,10 @@ void main() {
       'new-user@example.com',
     );
     await tester.enterText(
+      find.byKey(const Key('signUpAccountPasswordField')),
+      'test account password',
+    );
+    await tester.enterText(
       find.byKey(const Key('signUpMasterSecretField')),
       'correct horse battery staple',
     );
@@ -59,6 +63,76 @@ void main() {
     expect(find.text('Welcome to your vault'), findsOneWidget);
   });
 
+  testWidgets(
+    'recovery-mode step can go back to sign-up with values prefilled, and '
+    'sign-up rejects a master secret equal to the account password',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: testProviderOverrides(),
+          child: const PasswordManagerApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Need an account? Create one'));
+      await tester.pumpAndSettle();
+
+      // Master secret identical to the account password is rejected.
+      await tester.enterText(
+        find.byKey(const Key('signUpEmailField')),
+        'second-thoughts@example.com',
+      );
+      await tester.enterText(
+        find.byKey(const Key('signUpAccountPasswordField')),
+        'test account password',
+      );
+      await tester.enterText(
+        find.byKey(const Key('signUpMasterSecretField')),
+        'test account password',
+      );
+      await tester.tap(find.byKey(const Key('signUpContinueButton')));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Master secret must be different from your account password'),
+        findsOneWidget,
+      );
+
+      // Fix the master secret and continue to the recovery-mode step.
+      await tester.enterText(
+        find.byKey(const Key('signUpMasterSecretField')),
+        'correct horse battery staple',
+      );
+      await tester.tap(find.byKey(const Key('signUpContinueButton')));
+      await tester.pumpAndSettle();
+      expect(find.text('Choose your recovery mode'), findsOneWidget);
+
+      // Change of heart before confirming: back returns to sign-up with
+      // everything still filled in.
+      await tester.tap(find.byKey(const Key('recoveryModeBackButton')));
+      await tester.pumpAndSettle();
+      expect(find.text('second-thoughts@example.com'), findsOneWidget);
+      expect(
+        tester
+            .widget<TextFormField>(
+              find.byKey(const Key('signUpMasterSecretField')),
+            )
+            .controller
+            ?.text,
+        'correct horse battery staple',
+      );
+      expect(
+        tester
+            .widget<TextFormField>(
+              find.byKey(const Key('signUpAccountPasswordField')),
+            )
+            .controller
+            ?.text,
+        'test account password',
+      );
+    },
+  );
+
   testWidgets('sign-in flow: valid credentials reach the home screen', (
     WidgetTester tester,
   ) async {
@@ -78,6 +152,10 @@ void main() {
     await tester.enterText(
       find.byKey(const Key('signUpEmailField')),
       'returning-user@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('signUpAccountPasswordField')),
+      'test account password',
     );
     await tester.enterText(
       find.byKey(const Key('signUpMasterSecretField')),
@@ -103,6 +181,10 @@ void main() {
     await tester.enterText(
       find.byKey(const Key('signInEmailField')),
       'returning-user@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('signInAccountPasswordField')),
+      'test account password',
     );
     await tester.enterText(
       find.byKey(const Key('signInMasterSecretField')),

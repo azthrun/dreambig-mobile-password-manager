@@ -5,7 +5,12 @@ import 'package:password_manager/l10n/generated/app_localizations.dart';
 import 'package:password_manager/presentation/auth/auth_controller.dart';
 import 'package:password_manager/presentation/routing/app_router.dart';
 
-/// Step 1 of sign-up: collect email + master secret.
+/// Step 1 of sign-up: collect email + account password + master secret.
+///
+/// The account password authenticates with the backend; the master secret
+/// protects the vault. They are two deliberately distinct values (enforced
+/// by the validator below) so the credential sent to the server shares no
+/// input with the key that encrypts vault data.
 ///
 /// Deliberately does **not** create the account. It only stashes the
 /// credentials in the controller and moves to [RecoveryModeScreen], which
@@ -19,12 +24,31 @@ class SignUpScreen extends ConsumerStatefulWidget {
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _masterSecretController = TextEditingController();
+  late final TextEditingController _emailController;
+  late final TextEditingController _accountPasswordController;
+  late final TextEditingController _masterSecretController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Prefill from any pending sign-up so navigating back from the
+    // recovery-mode step restores what the user already typed.
+    final controller = ref.read(authControllerProvider.notifier);
+    _emailController = TextEditingController(
+      text: controller.pendingEmail ?? '',
+    );
+    _accountPasswordController = TextEditingController(
+      text: controller.pendingAccountPassword ?? '',
+    );
+    _masterSecretController = TextEditingController(
+      text: controller.pendingMasterSecret ?? '',
+    );
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
+    _accountPasswordController.dispose();
     _masterSecretController.dispose();
     super.dispose();
   }
@@ -35,6 +59,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         .read(authControllerProvider.notifier)
         .beginSignUp(
           email: _emailController.text.trim(),
+          accountPassword: _accountPasswordController.text,
           masterSecret: _masterSecretController.text,
         );
     context.go(AppRoutes.recoveryMode);
@@ -69,15 +94,34 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _accountPasswordController,
+                      key: const Key('signUpAccountPasswordField'),
+                      obscureText: true,
+                      autofillHints: const <String>[AutofillHints.newPassword],
+                      decoration: InputDecoration(
+                        labelText: l10n.authAccountPasswordLabel,
+                      ),
+                      validator: (value) => (value == null || value.length < 8)
+                          ? l10n.authAccountPasswordLabel
+                          : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
                       controller: _masterSecretController,
                       key: const Key('signUpMasterSecretField'),
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: l10n.authMasterSecretLabel,
                       ),
-                      validator: (value) => (value == null || value.length < 8)
-                          ? l10n.authMasterSecretLabel
-                          : null,
+                      validator: (value) {
+                        if (value == null || value.length < 8) {
+                          return l10n.authMasterSecretLabel;
+                        }
+                        if (value == _accountPasswordController.text) {
+                          return l10n.signUpMasterSecretMustDiffer;
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 24),
                     FilledButton(
