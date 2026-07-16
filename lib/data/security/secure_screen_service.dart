@@ -13,16 +13,19 @@ abstract class SecureScreenChannel {
 }
 
 /// Real implementation: a minimal, dedicated `MethodChannel` handled
-/// directly in `MainActivity.kt`.
+/// directly in `MainActivity.kt` (Android) and `AppDelegate.swift` (iOS).
 ///
 /// **Implementation choice**: there is no Flutter-level API for
-/// `FLAG_SECURE`, and pulling in a third-party plugin (e.g.
-/// `flutter_windowmanager`, `secure_application`) for what is a two-line
-/// native call is more dependency surface than the feature justifies
-/// (AGENTS.md: "avoid adding dependencies unless clearly justified").
-/// Instead this is a dedicated platform channel that just calls
+/// screen-capture protection, and pulling in a third-party plugin (e.g.
+/// `flutter_windowmanager`, `secure_application`, `screen_protector`) for
+/// what is a small native call is more dependency surface than the feature
+/// justifies (AGENTS.md: "avoid adding dependencies unless clearly
+/// justified"). Instead this is a dedicated platform channel that calls
 /// `Window.setFlags(FLAG_SECURE, FLAG_SECURE)` /
-/// `Window.clearFlags(FLAG_SECURE)` on the Android side.
+/// `Window.clearFlags(FLAG_SECURE)` on the Android side, and on iOS the
+/// best-effort equivalent in `SecureScreenController` (secure-text-field
+/// capture shield + app-switcher privacy cover — see AppDelegate.swift for
+/// the technique and its limits).
 class FlutterSecureScreenChannel implements SecureScreenChannel {
   const FlutterSecureScreenChannel();
 
@@ -38,7 +41,8 @@ class FlutterSecureScreenChannel implements SecureScreenChannel {
       });
     } on MissingPluginException {
       // No native implementation registered (e.g. running on a platform
-      // other than Android, or in a host that hasn't wired the channel).
+      // other than Android/iOS, or in a host that hasn't wired the
+      // channel).
     } on PlatformException {
       // Best-effort hardening; never block the app on this.
     }
@@ -58,8 +62,10 @@ class FakeSecureScreenChannel implements SecureScreenChannel {
   }
 }
 
-/// Toggles Android's `FLAG_SECURE` window flag, which blocks screenshots
-/// and screen recording/casting of the app's content (GOALS_v2 §2.5).
+/// Toggles screen-capture protection for the app's content (GOALS_v2
+/// §2.5): Android's `FLAG_SECURE` window flag (blocks screenshots and
+/// screen recording/casting outright) and, on iOS, the best-effort
+/// capture shield + app-switcher cover in `AppDelegate.swift`.
 ///
 /// **Granularity choice**: rather than threading this through every
 /// individual screen's lifecycle, it is toggled once, app-wide, based on
