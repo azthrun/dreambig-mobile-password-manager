@@ -1,6 +1,7 @@
 // Unit tests for the two-key derivation logic (GOALS_v2 §1.3): proving the
-// authentication key and vault key are independent derivations of the
-// master secret, not just convenience aliases of the same value.
+// authentication key and vault key are independent derivations of two
+// distinct user secrets (account password and master secret), not just
+// convenience aliases of the same value.
 
 import 'dart:convert';
 import 'dart:typed_data';
@@ -16,14 +17,16 @@ Argon2id _fastArgon2id() =>
 
 void main() {
   group('MasterKeyDeriver', () {
-    test('is deterministic for the same email + master secret', () async {
+    test('is deterministic for the same email + secrets', () async {
       final deriver = MasterKeyDeriver(argon2id: _fastArgon2id());
       final a = await deriver.deriveKeys(
         email: 'user@example.com',
+        accountPassword: 'account-password-1',
         masterSecret: 'correct horse battery staple',
       );
       final b = await deriver.deriveKeys(
         email: 'user@example.com',
+        accountPassword: 'account-password-1',
         masterSecret: 'correct horse battery staple',
       );
       expect(a.authKey, equals(b.authKey));
@@ -34,40 +37,57 @@ void main() {
       final deriver = MasterKeyDeriver(argon2id: _fastArgon2id());
       final a = await deriver.deriveKeys(
         email: 'User@Example.com',
+        accountPassword: 'account-password-1',
         masterSecret: 'correct horse battery staple',
       );
       final b = await deriver.deriveKeys(
         email: '  user@example.com  ',
+        accountPassword: 'account-password-1',
         masterSecret: 'correct horse battery staple',
       );
       expect(a.authKey, equals(b.authKey));
       expect(a.vaultKey, equals(b.vaultKey));
     });
 
-    test('authKey and vaultKey differ for the same master secret', () async {
-      final deriver = MasterKeyDeriver(argon2id: _fastArgon2id());
-      final derived = await deriver.deriveKeys(
-        email: 'user@example.com',
-        masterSecret: 'correct horse battery staple',
-      );
-      expect(derived.authKey, isNot(equals(derived.vaultKey)));
-    });
-
     test(
-      'changing the master secret changes both keys, independently of a '
-      'fixed salt/email',
+      'authKey and vaultKey differ even if the same value is used for both '
+      'secrets (HKDF domain separation)',
       () async {
         final deriver = MasterKeyDeriver(argon2id: _fastArgon2id());
-        final a = await deriver.deriveKeys(
+        final derived = await deriver.deriveKeys(
           email: 'user@example.com',
+          accountPassword: 'correct horse battery staple',
+          masterSecret: 'correct horse battery staple',
+        );
+        expect(derived.authKey, isNot(equals(derived.vaultKey)));
+      },
+    );
+
+    test(
+      'changing the master secret changes only the vault key; changing the '
+      'account password changes only the auth key',
+      () async {
+        final deriver = MasterKeyDeriver(argon2id: _fastArgon2id());
+        final base = await deriver.deriveKeys(
+          email: 'user@example.com',
+          accountPassword: 'account-password-one',
           masterSecret: 'master-secret-one',
         );
-        final b = await deriver.deriveKeys(
+        final newSecret = await deriver.deriveKeys(
           email: 'user@example.com',
+          accountPassword: 'account-password-one',
           masterSecret: 'master-secret-two',
         );
-        expect(a.authKey, isNot(equals(b.authKey)));
-        expect(a.vaultKey, isNot(equals(b.vaultKey)));
+        expect(newSecret.authKey, equals(base.authKey));
+        expect(newSecret.vaultKey, isNot(equals(base.vaultKey)));
+
+        final newPassword = await deriver.deriveKeys(
+          email: 'user@example.com',
+          accountPassword: 'account-password-two',
+          masterSecret: 'master-secret-one',
+        );
+        expect(newPassword.authKey, isNot(equals(base.authKey)));
+        expect(newPassword.vaultKey, equals(base.vaultKey));
       },
     );
 
@@ -75,10 +95,12 @@ void main() {
       final deriver = MasterKeyDeriver(argon2id: _fastArgon2id());
       final a = await deriver.deriveKeys(
         email: 'user-a@example.com',
+        accountPassword: 'account-password-1',
         masterSecret: 'correct horse battery staple',
       );
       final b = await deriver.deriveKeys(
         email: 'user-b@example.com',
+        accountPassword: 'account-password-1',
         masterSecret: 'correct horse battery staple',
       );
       expect(a.authKey, isNot(equals(b.authKey)));
@@ -124,7 +146,7 @@ void main() {
       },
     );
 
-    test('encodeAuthKeyForTransport never emits the raw master secret', () {
+    test('encodeAuthKeyForTransport never emits the raw secrets', () {
       final deriver = MasterKeyDeriver(argon2id: _fastArgon2id());
       const masterSecret = 'correct horse battery staple';
       final fakeAuthKey = Uint8List.fromList(List<int>.filled(32, 7));
@@ -139,13 +161,14 @@ void main() {
         final deriver = MasterKeyDeriver();
         final derived = await deriver.deriveKeys(
           email: 'user@example.com',
+          accountPassword: 'account-password-1',
           masterSecret: 'correct horse battery staple',
         );
         expect(derived.authKey, hasLength(32));
         expect(derived.vaultKey, hasLength(32));
         expect(derived.authKey, isNot(equals(derived.vaultKey)));
       },
-      timeout: const Timeout(Duration(seconds: 30)),
+      timeout: const Timeout(Duration(seconds: 60)),
     );
   });
 }

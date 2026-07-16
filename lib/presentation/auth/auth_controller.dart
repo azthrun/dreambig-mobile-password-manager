@@ -41,9 +41,10 @@ class AuthController extends Notifier<AuthState> {
   DeviceKeyStore get _deviceKeyStore => ref.read(deviceKeyStoreProvider);
 
   // Held only in memory for the brief window between the user entering
-  // their master secret at signup and completing the recovery-mode choice.
+  // their credentials at signup and completing the recovery-mode choice.
   // Cleared as soon as the account is created (or the attempt fails).
   String? _pendingEmail;
+  String? _pendingAccountPassword;
   String? _pendingMasterSecret;
 
   @override
@@ -58,7 +59,17 @@ class AuthController extends Notifier<AuthState> {
   }
 
   bool get hasPendingSignUp =>
-      _pendingEmail != null && _pendingMasterSecret != null;
+      _pendingEmail != null &&
+      _pendingAccountPassword != null &&
+      _pendingMasterSecret != null;
+
+  /// Pending sign-up values, exposed so [SignUpScreen] can prefill its
+  /// fields when the user navigates *back* from the recovery-mode step to
+  /// revise their choices. In-memory only, same lifetime as the pending
+  /// sign-up itself.
+  String? get pendingEmail => _pendingEmail;
+  String? get pendingAccountPassword => _pendingAccountPassword;
+  String? get pendingMasterSecret => _pendingMasterSecret;
 
   Future<void> _restore() async {
     final stored = await _storage.readSession();
@@ -78,14 +89,20 @@ class AuthController extends Notifier<AuthState> {
   /// Step 1 of sign-up. Does **not** create an account — only stashes
   /// credentials in memory until the recovery-mode choice (GOALS_v2 §1.3)
   /// is made.
-  void beginSignUp({required String email, required String masterSecret}) {
+  void beginSignUp({
+    required String email,
+    required String accountPassword,
+    required String masterSecret,
+  }) {
     _pendingEmail = email;
+    _pendingAccountPassword = accountPassword;
     _pendingMasterSecret = masterSecret;
     state = state.copyWith(clearError: true);
   }
 
   void cancelSignUp() {
     _pendingEmail = null;
+    _pendingAccountPassword = null;
     _pendingMasterSecret = null;
   }
 
@@ -94,13 +111,15 @@ class AuthController extends Notifier<AuthState> {
   /// derive keys and actually create the account.
   Future<void> completeSignUp(RecoveryMode recoveryMode) async {
     final email = _pendingEmail;
+    final accountPassword = _pendingAccountPassword;
     final masterSecret = _pendingMasterSecret;
-    if (email == null || masterSecret == null) {
+    if (email == null || accountPassword == null || masterSecret == null) {
       throw StateError(_l10n.noPendingAccountError);
     }
     try {
       final derived = await _deriver.deriveKeys(
         email: email,
+        accountPassword: accountPassword,
         masterSecret: masterSecret,
       );
       final authKey = _deriver.encodeAuthKeyForTransport(derived.authKey);
@@ -129,6 +148,7 @@ class AuthController extends Notifier<AuthState> {
       rethrow;
     } finally {
       _pendingEmail = null;
+      _pendingAccountPassword = null;
       _pendingMasterSecret = null;
     }
   }
@@ -160,11 +180,13 @@ class AuthController extends Notifier<AuthState> {
 
   Future<void> signIn({
     required String email,
+    required String accountPassword,
     required String masterSecret,
   }) async {
     try {
       final derived = await _deriver.deriveKeys(
         email: email,
+        accountPassword: accountPassword,
         masterSecret: masterSecret,
       );
       final authKey = _deriver.encodeAuthKeyForTransport(derived.authKey);
@@ -228,18 +250,18 @@ class AuthController extends Notifier<AuthState> {
     if (email == null) return false;
     final stored = await _storage.readSession();
     if (stored == null) return false;
-    final derived = await _deriver.deriveKeys(
+    final vaultKey = await _deriver.deriveVaultKey(
       email: email,
       masterSecret: masterSecret,
     );
-    final verifier = await vaultKeyVerifierOf(derived.vaultKey);
+    final verifier = await vaultKeyVerifierOf(vaultKey);
     if (!_bytesEqual(verifier, stored.vaultKeyVerifier)) {
       state = state.copyWith(errorMessage: _l10n.incorrectMasterSecretError);
       return false;
     }
     state = state.copyWith(
       status: AuthStatus.signedInUnlocked,
-      vaultKey: derived.vaultKey,
+      vaultKey: vaultKey,
       accessToken: stored.accessToken,
       refreshToken: stored.refreshToken,
       accessTokenExpiresAt: stored.accessTokenExpiresAt,
@@ -266,11 +288,11 @@ class AuthController extends Notifier<AuthState> {
     if (email == null) return false;
     final stored = await _storage.readSession();
     if (stored == null) return false;
-    final derived = await _deriver.deriveKeys(
+    final vaultKey = await _deriver.deriveVaultKey(
       email: email,
       masterSecret: masterSecret,
     );
-    final verifier = await vaultKeyVerifierOf(derived.vaultKey);
+    final verifier = await vaultKeyVerifierOf(vaultKey);
     return _bytesEqual(verifier, stored.vaultKeyVerifier);
   }
 
@@ -307,6 +329,7 @@ class AuthController extends Notifier<AuthState> {
     await _deviceKeyStore.clear();
     await _storage.clear();
     _pendingEmail = null;
+    _pendingAccountPassword = null;
     _pendingMasterSecret = null;
     state = const AuthState.signedOut();
   }
@@ -428,6 +451,7 @@ class AuthController extends Notifier<AuthState> {
   Future<void> _forceSignOutAfterInvalidSession() async {
     await _storage.clear();
     _pendingEmail = null;
+    _pendingAccountPassword = null;
     _pendingMasterSecret = null;
     state = const AuthState.signedOut().copyWith(
       errorMessage: _l10n.sessionInvalidError,
@@ -446,6 +470,7 @@ class AuthController extends Notifier<AuthState> {
     }
     await _storage.clear();
     _pendingEmail = null;
+    _pendingAccountPassword = null;
     _pendingMasterSecret = null;
     state = const AuthState.signedOut();
   }

@@ -33,6 +33,7 @@ void main() {
           .read(authControllerProvider.notifier)
           .beginSignUp(
             email: 'user@example.com',
+            accountPassword: 'test account password',
             masterSecret: 'correct horse battery staple',
           );
 
@@ -91,6 +92,7 @@ void main() {
           .read(authControllerProvider.notifier)
           .beginSignUp(
             email: 'user@example.com',
+            accountPassword: 'test account password',
             masterSecret: 'correct horse battery staple',
           );
 

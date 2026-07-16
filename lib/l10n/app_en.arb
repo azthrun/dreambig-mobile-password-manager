@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Password Manager",
+  "appTitle": "PassMan",
   "@appTitle": {
     "description": "The application's title, shown in the OS task switcher and as a fallback window title."
   },
@@ -19,6 +19,14 @@
   "authEmailLabel": "Email",
   "@authEmailLabel": {
     "description": "Label for the email text field on auth screens."
+  },
+  "authAccountPasswordLabel": "Account password",
+  "@authAccountPasswordLabel": {
+    "description": "Label for the account password field — the credential used to authenticate with the backend, distinct from the master secret."
+  },
+  "signUpMasterSecretMustDiffer": "Master secret must be different from your account password",
+  "@signUpMasterSecretMustDiffer": {
+    "description": "Validation error shown at sign-up when the master secret equals the account password."
   },
   "authMasterSecretLabel": "Master secret",
   "@authMasterSecretLabel": {

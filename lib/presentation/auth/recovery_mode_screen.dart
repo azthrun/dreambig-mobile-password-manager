@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:password_manager/domain/auth/recovery_mode.dart';
 import 'package:password_manager/l10n/generated/app_localizations.dart';
 import 'package:password_manager/presentation/auth/auth_controller.dart';
+import 'package:password_manager/presentation/routing/app_router.dart';
 
 /// Step 2 of sign-up: the explicit, up-front recovery-mode choice required
 /// by GOALS_v2 §1.3 (decision #3) — shown *before* the account/vault is
@@ -42,7 +44,19 @@ class _RecoveryModeScreenState extends ConsumerState<RecoveryModeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.recoveryModeTitle)),
+      appBar: AppBar(
+        title: Text(l10n.recoveryModeTitle),
+        // Last chance to reconsider before the account is actually created:
+        // going back returns to the sign-up form with the pending values
+        // still prefilled (they stay stashed in AuthController until
+        // completeSignUp runs or sign-up is cancelled).
+        leading: BackButton(
+          key: const Key('recoveryModeBackButton'),
+          onPressed: _submitting
+              ? null
+              : () => context.go(AppRoutes.signUp),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

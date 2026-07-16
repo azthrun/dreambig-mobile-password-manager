@@ -38,6 +38,7 @@ void main() {
       final controller = container.read(authControllerProvider.notifier);
       controller.beginSignUp(
         email: 'verify@example.com',
+        accountPassword: 'test account password',
         masterSecret: 'correct horse battery staple',
       );
       await controller.completeSignUp(
@@ -86,6 +87,7 @@ void main() {
       final controller = container.read(authControllerProvider.notifier);
       controller.beginSignUp(
         email: 'delete-controller@example.com',
+        accountPassword: 'test account password',
         masterSecret: 'correct horse battery staple',
       );
       await controller.completeSignUp(RecoveryMode.localOnly);

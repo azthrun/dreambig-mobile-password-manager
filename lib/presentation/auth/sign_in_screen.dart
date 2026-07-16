@@ -5,9 +5,10 @@ import 'package:password_manager/l10n/generated/app_localizations.dart';
 import 'package:password_manager/presentation/auth/auth_controller.dart';
 import 'package:password_manager/presentation/routing/app_router.dart';
 
-/// Returning-user sign-in: email + master secret, from which the auth key
-/// is derived on-device and sent to `ApiClient.signIn` — the master secret
-/// itself never leaves this screen (GOALS_v2 §1.3).
+/// Returning-user sign-in: email + account password + master secret. The
+/// auth key is derived on-device from the account password and sent to
+/// `ApiClient.signIn`; the master secret is used only to re-derive the
+/// vault key locally and never leaves this screen (GOALS_v2 §1.3).
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
@@ -18,6 +19,7 @@ class SignInScreen extends ConsumerStatefulWidget {
 class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final _accountPasswordController = TextEditingController();
   final _masterSecretController = TextEditingController();
   bool _submitting = false;
   String? _error;
@@ -25,6 +27,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   @override
   void dispose() {
     _emailController.dispose();
+    _accountPasswordController.dispose();
     _masterSecretController.dispose();
     super.dispose();
   }
@@ -41,6 +44,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           .read(authControllerProvider.notifier)
           .signIn(
             email: _emailController.text.trim(),
+            accountPassword: _accountPasswordController.text,
             masterSecret: _masterSecretController.text,
           );
       // Router redirect takes it from here (status -> signedInUnlocked).
@@ -77,6 +81,19 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       validator: (value) =>
                           (value == null || !value.contains('@'))
                           ? l10n.authEmailLabel
+                          : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _accountPasswordController,
+                      key: const Key('signInAccountPasswordField'),
+                      obscureText: true,
+                      autofillHints: const <String>[AutofillHints.password],
+                      decoration: InputDecoration(
+                        labelText: l10n.authAccountPasswordLabel,
+                      ),
+                      validator: (value) => (value == null || value.isEmpty)
+                          ? l10n.authAccountPasswordLabel
                           : null,
                     ),
                     const SizedBox(height: 16),
